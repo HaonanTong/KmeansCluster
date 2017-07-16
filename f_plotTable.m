@@ -1,5 +1,7 @@
 function [ fig, ngene, expr,plotData, agis, agis_new ] = ...
     f_plotTable( csv, transfile, varargin )
+warning('off')
+
 % [ fig, ngene, expr, agis ] = plotTable( csv, isVariableNames )
 % fig - figure of profiles in csv file
 % ngene - # of genes in the file
@@ -29,12 +31,24 @@ function [ fig, ngene, expr,plotData, agis, agis_new ] = ...
 %   'No Variable Name' - Expression Profile Table not contains Variable
 %                   Names
 if nargin < 2
+    fprintf('#####################################\n');
+
     fprintf('\ntwo parameter required for the function\n');
     fprintf(' path of .csv file as the first parameter\n');
     fprintf(' if the file contains VariableNames as second parameter\n');
     fprintf(' example:  [ fig, ngene, expr, agis ] = plotTable(''kat-rpkm-expression.csv'', 1)\n\n');
+    fprintf('#####################################\n');
+
     return;
 end
+
+fprintf('#####################################\n');
+fprintf('@PGRP\n');
+fprintf('By Haonan Tong\n');
+fprintf('#####################################\n');
+
+
+fprintf('Preparing ploting\n');
 
 csv_token = strtok(csv,'.');
 segments = string(0);
@@ -120,6 +134,8 @@ if any(strcmp(varargin,'Mean Plot'))
     
 
     print(fig{counter},sprintf('./Figures/%s-Mean-Plot',csv_token),'-dpng');
+    fprintf(' Success!\n')
+    fprintf('#####################################\n');
 
 end
 

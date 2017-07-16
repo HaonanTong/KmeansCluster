@@ -5,6 +5,7 @@ function [ T_summary, Table_Result ] = f_kmeans( csv, nclusters )
 %@Haonan Tong
 %PGRP Cluster in kmeans.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+warning('off')
 
 fprintf('#####################################\n');
 fprintf('Kmeans algorithm on profiles from %s\n',csv);
@@ -16,12 +17,11 @@ fprintf('#####################################\n');
 %% Load RPKM Data
 fprintf('loading file...\n');
 T = readtable(csv,...
- 'ReadVariableNames',true);
+ 'ReadVariableNames',true,'ReadRowNames',true);
 
 % summary(T);
  
-Data = table2array(T(:,2:end));
-agis = table2array(T(:,1));
+Data = table2array(T);
 % T.Properties.VariableNames
 
 fprintf('Success!\n');
@@ -89,19 +89,28 @@ fprintf('Success!\n');
 
 
 % summary(T_summary);
-fprintf('Exporing files...\n');
+fprintf('Exporting files...\n');
 writetable(T_summary,sprintf('./Result/ncluster%d/T_summary',nclusters))
 
 % Print out each cluster to files
 Table_Result = cell(nclusters,1);
 for i = 1 : nclusters
     Table_Result{i} = T(idx==i,:);
-    writetable(Table_Result{i},sprintf('./Result/ncluster%d/cluster%d.csv',nclusters,i))
+    writetable(Table_Result{i},sprintf('./Result/ncluster%d/cluster%d.csv',nclusters,i),'WriteRowNames',true)
+end
+
+for i = 1 : nclusters
+    tmp = strtok(Table_Result{i}.Properties.RowNames,'.');
+    tmp = unique(tmp);
+    fp = fopen(sprintf('./Result/ncluster%d/Gene-list-cluster%d.txt',nclusters,i),'wt');
+    fprintf(fp, '%s\n', tmp{:,:});
+    fclose(fp);
 end
 
 fprintf('Success!\n');
 fprintf('Done!\n');
 fprintf('#####################################\n');
+
 
 %% Talle Output
 %% Output feature vector to a table

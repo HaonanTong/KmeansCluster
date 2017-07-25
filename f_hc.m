@@ -1,11 +1,12 @@
-function [ T_summary, Table_Result ] = f_kmeans( csv, nclusters )
+function [ T_summary, Table_Result ] = f_hc( csv, nclusters )
 % csv - exel file with 3 replicates for each time point, totally 6 time
 % nclusters - # of clusters expected
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %@Haonan Tong
-%PGRP Cluster in kmeans.
+%PGRP Hierarchical Clustering
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global myDir
+
 
 warning('off')
 
@@ -61,14 +62,31 @@ FeaMtrx = 1/3*FeaMtrx;
 FeaMtrx = FeaMtrx - repmat(mean(FeaMtrx,2),1,size(FeaMtrx,2));
 
 fprintf('Applying kmeans...\n');
-%% Kmeans
-% Kmeans initialization
+%% HC
+% initialization
 ngenes = zeros(nclusters,1); % initialize # of genes in each cluster;
 str = sprintf('ncluster%d',nclusters);
-mkdir('./KMEANS_Result',str);
+mkdir('./HC_Result',str);
 
-% Kmeans operation
-idx = kmeans(FeaMtrx,nclusters);
+% hc operation
+Z = linkage(FeaMtrx,'complete','euclidean');
+dendrogram(Z);
+idx = cluster(Z,'maxclust',nclusters:(nclusters+5));
+
+% find the idx indicator
+logical_array = max(idx == nclusters);
+idx_indicator = find(logical_array==1);
+idx_indicator = idx_indicator(1);
+
+if any(logical_array)
+    idx = idx(:,idx_indicator);
+else
+    fprintf('fail to generate %d clusters\n',nclusters);
+    fprintf('instead, generate %d clusters\n.',max(idx));
+    idx = idx(:,1);
+end
+
+nclusters = max(idx);
 
 
 %% Result Analysis
@@ -98,19 +116,19 @@ for i = 1 : nclusters % derive subtable for each cluster
 end
 
 fprintf('Unique annotation of gene in TAIR ID...\n');
-cluster = cell(nclusters,1);
+c_cluster = cell(nclusters,1);
 for i = 1 : nclusters % print out anonotation for genes
     fp = fopen(sprintf('%s/Gene-list-cluster%d.txt',myDir,i),'wt');
     fprintf(fp, 'cluster%d\n', i);
     tmp = strtok(Table_Result{i}.Properties.RowNames,'.');
-    cluster{i} = unique(tmp);
-    ngenes2(i) = length(cluster{i});
-    fprintf(fp, '%s\n', cluster{i}{:,:});
+    c_cluster{i} = unique(tmp);
+    ngenes2(i) = length(c_cluster{i});
+    fprintf(fp, '%s\n', c_cluster{i}{:,:});
     fclose(fp);
 end
 
 MainFolder = pwd;
-cd(sprintf('%s',myDir))
+cd(myDir)
 unix(sprintf('paste -d ''\t'' Gene-list-cluster*.txt > T_validation%d.txt',nclusters))
 cd(MainFolder);
 
@@ -143,5 +161,8 @@ fprintf('#####################################\n');
 % writetable(plotData,'./Result/plotData.csv','WriteRowNames',true)
 
 end
+
+
+
 
 

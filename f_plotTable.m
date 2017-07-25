@@ -1,6 +1,10 @@
 function [ fig, ngene, expr,plotData, agis, agis_new ] = ...
     f_plotTable( csv, transfile, varargin )
 warning('off')
+% #####################################
+% @PGRP
+% Haonan Tong
+% #####################################
 
 % [ fig, ngene, expr, agis ] = plotTable( csv, isVariableNames )
 % fig - figure of profiles in csv file
@@ -42,23 +46,24 @@ if nargin < 2
     return;
 end
 
-fprintf('#####################################\n');
-fprintf('@PGRP\n');
-fprintf('By Haonan Tong\n');
-fprintf('#####################################\n');
+
 
 
 fprintf('Preparing ploting\n');
 
-csv_token = strtok(csv,'.');
-segments = string(0);
-remain = csv_token;
-while (remain ~= "")
-   [token,remain] = strtok(remain, '/');
-   segments = [segments ; token];
-end
-csv_token = segments(end);
-mkdir('Figures');
+% csv_token = strtok(csv,'.');
+% segments = string(0);
+% remain = csv_token;
+% while (remain ~= "")
+%    [token,remain] = strtok(remain, '/');
+%    segments = [segments ; token];
+% end
+% csv_token = segments(end);
+
+[pathstr,csv_token,~] = fileparts(csv);
+
+dir_Figures = strcat(pathstr,'/Figures');
+mkdir(dir_Figures);
 
 % fig = cell(nargin-2);
 counter = 0;
@@ -133,7 +138,7 @@ if any(strcmp(varargin,'Mean Plot'))
     set(gca,'fontsize',14);
     
 
-    print(fig{counter},sprintf('./Figures/%s-Mean-Plot',csv_token),'-dpng');
+    print(fig{counter},sprintf('%s/%s-Mean-Plot',dir_Figures,csv_token),'-dpng');
     fprintf(' Success!\n')
     fprintf('#####################################\n');
 

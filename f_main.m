@@ -22,10 +22,12 @@ for i = 1 : len
         [ ~, ~ ] = f_kmeans( fstr , nclusters );
     elseif strcmp(pattern,'HC')
             [~,~] = f_hc( fstr, nclusters );
+    elseif strcmp(pattern,'FCMEANS')
+        [~,~] = f_fcmeans(fstr, nclusters, []);
     end
 
     %% Plot Tables
-    myFiles = dir(fullfile(myDir,'*.csv')); %gets all wav files in struct
+    myFiles = dir(fullfile(myDir,'cluster*.csv')); %gets all wav files in struct
 
     fig = cell(length(myFiles),1);
     for k = 1:length(myFiles)

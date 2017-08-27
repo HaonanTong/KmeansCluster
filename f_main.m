@@ -15,7 +15,8 @@ len = length(nc_array);
 for i = 1 : len
     nclusters = nc_array(i);
     myDir = sprintf('./%s_Result/ncluster%d',pattern,nclusters); %gets directory
-    fstr = 'Profiles-ANan-DEGs.csv';
+    % fstr = 'Profiles-ANan-DEGs.csv';
+    fstr = 'Profiles-ANan-up-regulated.csv';
     rng(1000); % For reproducibility seed
     fprintf('Applying kmeans to %s with number of cluster %d', fstr, nclusters);
     if strcmp(pattern,'KMEANS')
